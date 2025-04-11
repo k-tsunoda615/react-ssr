@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Page() {
   // 初回レンダリング時のみログを出力するための参照
@@ -99,6 +100,9 @@ export default function Page() {
               ? 'ハイドレーション完了（クライアントサイド）'
               : 'ハイドレーション前（初期レンダリング）'}
           </p>
+          <Link to="/hydration" style={{ color: '#646cff', textDecoration: 'underline' }}>
+            ハイドレーションとは？
+          </Link>
         </div>
 
         <p>
