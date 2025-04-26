@@ -1,65 +1,36 @@
-import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 export default function Page() {
-  // 初回レンダリング時のみログを出力するための参照
-  const isFirstRender = useRef(true);
-
-  if (isFirstRender.current) {
-    console.log(
-      'レンダリング環境:',
-      typeof window !== 'undefined' ? 'クライアントサイド' : 'サーバーサイド'
-    );
-    console.log(
-      'window オブジェクト:',
-      typeof window !== 'undefined' ? '存在します' : '存在しません'
-    );
-
-    // クライアントサイドでのみ参照を更新
-    if (typeof window !== 'undefined') {
-      isFirstRender.current = false;
-    }
-  }
-
-  const isClient = typeof window !== 'undefined';
+  // サーバーとクライアントで安全に動作する状態
+  const [isClient, setIsClient] = useState(false);
   const [clientTime, setClientTime] = useState<string>('Loading...');
   const [serverTime] = useState<string>(new Date().toISOString());
   const [count, setCount] = useState(0);
   const [windowWidth, setWindowWidth] = useState<number | null>(null);
-  const [hydrated, setHydrated] = useState(false);
 
-  // 安全にwindowにアクセスする関数
-  function getWindowDimension(dimension: 'width' | 'height'): number | null {
-    try {
-      return dimension === 'width' ? window.innerWidth : window.innerHeight;
-    } catch (e) {
-      console.error('windowオブジェクトにアクセスできません（サーバーサイド）');
-      return null;
-    }
-  }
-
+  // クライアントサイドでのみ実行される処理
   useEffect(() => {
-    // このコードブロックはクライアントサイドでのみ実行される
-    console.log('useEffect実行: クライアントサイドでのみ実行されます');
-    setHydrated(true);
+    // クライアントサイドであることをマーク
+    setIsClient(true);
 
     // クライアント時間を設定
     setClientTime(new Date().toISOString());
 
-    // windowオブジェクトを使用
-    setWindowWidth(getWindowDimension('width'));
+    // windowオブジェクトを安全に使用
+    if (typeof window !== 'undefined') {
+      setWindowWidth(window.innerWidth);
 
-    // 時間を更新するタイマー
-    const timer = setInterval(() => {
-      setClientTime(new Date().toISOString());
-    }, 1000);
+      // 時間を更新するタイマー
+      const timer = setInterval(() => {
+        setClientTime(new Date().toISOString());
+      }, 1000);
 
-    return () => clearInterval(timer);
+      return () => clearInterval(timer);
+    }
   }, []);
 
   // カウンターを増加させる関数
   const incrementCount = () => {
-    console.log('ボタンがクリックされました（クライアントサイドのみ）');
     setCount((prevCount) => prevCount + 1);
   };
 
@@ -67,8 +38,7 @@ export default function Page() {
     <div
       style={{
         fontFamily: 'Arial, sans-serif',
-        maxWidth: '1000px',
-        width: '100%',
+        maxWidth: '800px',
         margin: '0 auto',
         padding: '20px',
       }}
@@ -89,20 +59,16 @@ export default function Page() {
         <div
           style={{
             padding: '10px',
-            background: hydrated ? '#e6ffe6' : '#ffe6e6',
+            background: isClient ? '#e6ffe6' : '#ffe6e6',
             borderRadius: '4px',
-            marginBottom: '10px',
           }}
         >
           <p>
-            <strong>ハイドレーション状態:</strong>{' '}
-            {hydrated
-              ? 'ハイドレーション完了（クライアントサイド）'
-              : 'ハイドレーション前（初期レンダリング）'}
+            <strong>レンダリング状態:</strong>{' '}
+            {isClient
+              ? 'クライアントサイド (ハイドレーション完了)'
+              : 'サーバーサイド (初期レンダリング)'}
           </p>
-          <Link to="/hydration" style={{ color: '#646cff', textDecoration: 'underline' }}>
-            ハイドレーションとは？
-          </Link>
         </div>
 
         <p>
@@ -112,7 +78,6 @@ export default function Page() {
           <strong>クライアント時間 (1秒ごとに更新):</strong> {clientTime}
         </p>
 
-        {/* 条件付きレンダリングでwindowの存在を確認 */}
         {isClient ? (
           <p>
             <strong>ブラウザの幅:</strong> {windowWidth}px (クライアントサイドで取得)
@@ -156,56 +121,13 @@ export default function Page() {
         >
           リセット
         </button>
-
-        <div
-          style={{ marginTop: '15px', padding: '10px', background: '#f9f9f9', borderRadius: '4px' }}
-        >
-          <p>
-            <strong>確認方法:</strong>
-          </p>
-          <ol style={{ paddingLeft: '20px' }}>
-            <li>ボタンをクリックしてカウントを増やす</li>
-            <li>右クリック → 「ページのソースを表示」を選択</li>
-            <li>
-              HTMLソース内にはカウンター値を含むアプリケーションのコンテンツ自体が存在しないことを確認（CSRの特徴）
-            </li>
-          </ol>
-        </div>
       </div>
 
-      <div
-        style={{
-          background: '#e8f4fd',
-          padding: '15px',
-          borderRadius: '5px',
-          marginBottom: '20px',
-        }}
-      >
-        <h2>SSRとCSRの違いを確認する方法</h2>
-        <ul style={{ lineHeight: '1.6' }}>
-          <li>
-            <strong>コンソールログを確認:</strong> ブラウザの開発者ツールでコンソールを開き、
-            「レンダリング環境」と「window オブジェクト」のログを確認してください。
-            サーバーサイドとクライアントサイドで異なるメッセージが表示されます。
-          </li>
-          <li>
-            <strong>ネットワークを遅くして観察:</strong> 開発者ツール → Network → Throttling で
-            「Slow 3G」などを選択し、ページを再読み込みします。JavaScriptが読み込まれる前に
-            ボタンをクリックしても反応がないことを確認できます。
-          </li>
-          <li>
-            <strong>ページソースを確認:</strong> 右クリック → 「ページのソースを表示」で、
-            サーバーから送信された初期HTMLを確認できます。クライアントサイドでの変更は
-            ここには反映されません。
-          </li>
-        </ul>
-      </div>
-
-      <div style={{ background: '#fff3e0', padding: '15px', borderRadius: '5px' }}>
+      <div style={{ background: '#e8f4fd', padding: '15px', borderRadius: '5px' }}>
         <h2>SSRとCSRの主な違い</h2>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ background: '#ffcc80' }}>
+            <tr style={{ background: '#bbdefb' }}>
               <th style={{ padding: '8px', border: '1px solid #ddd', textAlign: 'left' }}>
                 機能/動作
               </th>
@@ -244,3 +166,5 @@ export default function Page() {
     </div>
   );
 }
+
+export { Page };
