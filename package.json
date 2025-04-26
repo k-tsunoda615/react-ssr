@@ -5,12 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
+    "build:server": "swc server.ts -o server.js",
     "preview": "vite preview",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "prepare": "husky",
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev:server": "nodemon --watch server.ts --exec \"yarn build:server && yarn start\""
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -26,12 +28,12 @@
     "express": "^5.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.5.0"
+    "react-router-dom": "6.x"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
-    "@swc/cli": "^0.7.3",
-    "@swc/core": "^1.11.22",
+    "@swc/cli": "^0.3.10",
+    "@swc/core": "^1.4.8",
     "@types/compression": "^1.7.5",
     "@types/express": "^5.0.1",
     "@types/react": "^19.0.10",
@@ -52,7 +54,6 @@
     "prettier": "^3.5.3",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
-    "vite": "^6.2.0",
-    "vite-plugin-ssr": "^0.4.142"
+    "vite": "^6.2.0"
   }
 }
