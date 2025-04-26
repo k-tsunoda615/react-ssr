@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "outDir": "./dist",
+    "rootDir": ".",
+    "strict": true,
+    "jsx": "react-jsx",
+    "allowJs": true
+  },
+  "include": ["server.ts"],
+  "exclude": ["node_modules"]
+}
