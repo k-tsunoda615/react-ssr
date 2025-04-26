@@ -1,46 +1,39 @@
 import express from 'express';
-import compression from 'compression';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-import React from 'react';
 import { renderToString } from 'react-dom/server';
-import { StaticRouter } from 'react-router-dom/server.js';
 import App from './src/App';
+import React from 'react';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// 圧縮ミドルウェアを使用
-app.use(compression() as any);
+console.log('Server initialization started');
 
-// 静的ファイルの提供
-app.use(express.static(path.resolve(__dirname, '..', 'dist')));
-
-// HTMLテンプレートを読み込む
-const template = fs.readFileSync(path.resolve(__dirname, '..', 'dist', 'index.html'), 'utf-8');
-
-// すべてのリクエストに対してSSRを実行
-app.get('*', (req, res) => {
+// メインのルートハンドラを先に定義
+app.get('/', (req, res) => {
+  console.log('Request received:', req.url);
   try {
-    // Reactアプリケーションをサーバーサイドでレンダリング
-    const appHtml = renderToString(
-      React.createElement(StaticRouter, { location: req.url }, React.createElement(App))
-    );
+    const appHtml = renderToString(React.createElement(App, null));
+    console.log('Rendered HTML:', appHtml);
 
-    // テンプレートにレンダリング結果を挿入
+    // テンプレートファイルを読み込む
+    const template = fs.readFileSync(path.resolve(__dirname, '..', 'dist', 'index.html'), 'utf-8');
     const html = template.replace('<div id="root"></div>', `<div id="root">${appHtml}</div>`);
 
     res.send(html);
-  } catch (error) {
-    console.error('Rendering error:', error);
-    res.status(500).send('Internal Server Error');
+  } catch (error: unknown) {
+    console.error('Error details:', error);
+    res
+      .status(500)
+      .send(`Internal Server Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`サーバーが起動しました: http://localhost:${PORT}`);
+// 静的ファイルの提供を後で追加
+app.use(express.static('dist'));
+
+app.listen(3000, () => {
+  console.log('Server started: http://localhost:3000');
 });

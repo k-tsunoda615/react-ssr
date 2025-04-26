@@ -1,5 +1,3 @@
-import Page from './pages/index';
-
 export default function App() {
-  return <Page />;
+  return <h1>Hello</h1>; // divすら使わない最小構成
 }
