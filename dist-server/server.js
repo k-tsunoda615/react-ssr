@@ -3,10 +3,13 @@ import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
 import { renderToString } from "react-dom/server";
-import { jsx } from "react/jsx-runtime";
+import { jsxs, jsx } from "react/jsx-runtime";
 import React from "react";
 function App() {
-  return /* @__PURE__ */ jsx("h1", { children: "Hello" });
+  return /* @__PURE__ */ jsxs("div", { children: [
+    /* @__PURE__ */ jsx("h1", { children: "Hello" }),
+    /* @__PURE__ */ jsx("p", { children: "This is a test" })
+  ] });
 }
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
