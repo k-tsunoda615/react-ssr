@@ -11,7 +11,7 @@ const app = express();
 
 console.log('Server initialization started');
 
-// メインのルートハンドラを先に定義
+// メインのルートハンドラ
 app.get('/', (req, res) => {
   console.log('Request received:', req.url);
   try {
@@ -20,6 +20,8 @@ app.get('/', (req, res) => {
 
     // テンプレートファイルを読み込む
     const template = fs.readFileSync(path.resolve(__dirname, '..', 'dist', 'index.html'), 'utf-8');
+
+    // クライアントサイドのJavaScriptを読み込むためのスクリプトタグを追加
     const html = template.replace('<div id="root"></div>', `<div id="root">${appHtml}</div>`);
 
     res.send(html);
@@ -31,7 +33,7 @@ app.get('/', (req, res) => {
   }
 });
 
-// 静的ファイルの提供を後で追加
+// 静的ファイルの提供
 app.use(express.static('dist'));
 
 app.listen(3000, () => {
