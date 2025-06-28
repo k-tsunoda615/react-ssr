@@ -1,13 +1,6 @@
-import React from 'react';
-
 export default function About() {
   return (
     <div className="about-page">
-      <header>
-        <h1>About - React SSR + Hydration デモ</h1>
-        <p>このプロジェクトについて</p>
-      </header>
-
       <main>
         <section className="about-content">
           <h2>プロジェクト概要</h2>
