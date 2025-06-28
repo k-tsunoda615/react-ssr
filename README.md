@@ -1,54 +1,65 @@
-# React + TypeScript + Vite
+# React SSR + Hydration デモ
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React Server-Side Rendering (SSR) と Hydration の実装例です。
 
-Currently, two official plugins are available:
+## セットアップ
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+# 依存関係のインストール
+yarn install
 
-## Expanding the ESLint configuration
+# 開発サーバーの起動
+yarn dev
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+# 本番ビルド
+yarn build
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+# 本番サーバーの起動
+yarn start
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 技術スタック
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **React 18**
+- **TypeScript**
+- **Vite**
+- **Express**: サーバーサイドレンダリング用のサーバー
+- **React DOM**: サーバーサイドレンダリングとHydration
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+### 動作の流れ
+
+1. サーバーでReactコンポーネントをHTMLにレンダリング
+2. クライアントにHTMLを送信
+3. クライアントでJavaScriptが読み込まれる
+4. `hydrateRoot`により、既存のHTMLにReactの機能を追加
+5. インタラクティブな機能が有効になる
+
+## ファイル構成
+
 ```
+src/
+├── App.tsx              # メインアプリケーション
+├── main.tsx             # クライアントサイドエントリーポイント
+├── components/
+│   ├── Counter.tsx      # カウンターコンポーネント
+│   ├── ToggleButton.tsx # トグルボタンコンポーネント
+│   └── Sidebar.tsx      # サイドバーコンポーネント
+└── App.css              # スタイルシート
+```
+
+## 開発
+
+```bash
+# 開発モードでサーバーを起動
+yarn dev
+
+# コードの品質チェック
+yarn lint
+
+# コードのフォーマット
+yarn format
+```
+
+## デプロイ
+
+GHAによりVercelへ自動デプロイされます
